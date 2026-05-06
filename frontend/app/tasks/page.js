@@ -13,12 +13,13 @@ export default function TasksPage() {
   const [modalStatus, setModalStatus] = useState("todo");
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskPriority, setNewTaskPriority] = useState("medium");
+  const [newTaskAssignee, setNewTaskAssignee] = useState("");
   const [tasks, setTasks] = useState([
-    { id: 1, title: "Design System Update", priority: "high", status: "todo", duration: "4h", category: "Design" },
-    { id: 2, title: "Fix Dashboard Sidebar", priority: "medium", status: "in-progress", duration: "2h", category: "Dev" },
-    { id: 3, title: "Client Presentation", priority: "urgent", status: "todo", duration: "1h", category: "Business" },
-    { id: 4, title: "Database Migration", priority: "high", status: "completed", duration: "6h", category: "Dev" },
-    { id: 5, title: "User Feedback Loop", priority: "low", status: "in-progress", duration: "3h", category: "Product" },
+    { id: 1, title: "Design System Update", priority: "high", status: "todo", duration: "4h", category: "Design", assignee: "Alex Carter" },
+    { id: 2, title: "Fix Dashboard Sidebar", priority: "medium", status: "in-progress", duration: "2h", category: "Dev", assignee: "Sarah Lee" },
+    { id: 3, title: "Client Presentation", priority: "urgent", status: "todo", duration: "1h", category: "Business", assignee: "John Doe" },
+    { id: 4, title: "Database Migration", priority: "high", status: "completed", duration: "6h", category: "Dev", assignee: "Alex Carter" },
+    { id: 5, title: "User Feedback Loop", priority: "low", status: "in-progress", duration: "3h", category: "Product", assignee: "Sarah Lee" },
   ]);
 
   useEffect(() => {
@@ -41,6 +42,13 @@ export default function TasksPage() {
     }
   };
 
+  const priorityWeight = {
+    urgent: 0,
+    high: 1,
+    medium: 2,
+    low: 3
+  };
+
   const addTask = (status) => {
     setModalStatus(status);
     setIsModalOpen(true);
@@ -58,13 +66,15 @@ export default function TasksPage() {
       priority: newTaskPriority, 
       status: modalStatus, 
       duration: "1h", 
-      category: "Product" 
+      category: "Product",
+      assignee: newTaskAssignee || "Unassigned"
     };
 
     setTasks(prev => [...prev, newTask]);
     setIsModalOpen(false);
     setNewTaskTitle("");
     setNewTaskPriority("medium");
+    setNewTaskAssignee("");
 
     toast.success(`Task added to ${modalStatus}`, {
       icon: '🚀',
@@ -143,7 +153,10 @@ export default function TasksPage() {
                             <button onClick={() => addTask(col.id)} className="text-xs font-black text-primary hover:underline uppercase tracking-tighter">Create First Task</button>
                           </div>
                         ) : (
-                          tasks.filter(t => t.status === col.id).map((task) => (
+                          tasks
+                            .filter(t => t.status === col.id)
+                            .sort((a, b) => priorityWeight[a.priority] - priorityWeight[b.priority])
+                            .map((task) => (
                             <motion.div 
                               layout
                               initial={{ scale: 0.9, opacity: 0 }}
@@ -164,6 +177,16 @@ export default function TasksPage() {
                                       <span className="material-symbols-outlined text-[14px]">schedule</span>
                                       {task.duration}
                                     </span>
+                                    {task.assignee && (
+                                      <div className="flex items-center gap-1.5 ml-1 pl-2 border-l border-outline/50">
+                                        <div className="w-4 h-4 rounded-full bg-primary/20 flex items-center justify-center text-[8px] font-black text-primary uppercase">
+                                          {task.assignee.split(' ').map(n => n[0]).join('')}
+                                        </div>
+                                        <span className="text-[10px] text-on-surface-variant font-bold opacity-60">
+                                          {task.assignee}
+                                        </span>
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
                                 <button 
@@ -307,6 +330,16 @@ export default function TasksPage() {
                     value={newTaskTitle}
                     onChange={(e) => setNewTaskTitle(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && confirmAddTask()}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest">Assign To</label>
+                  <input 
+                    className="w-full bg-surface-container border border-outline rounded-xl p-4 text-on-surface focus:border-primary outline-none transition-colors"
+                    placeholder="Employee Name"
+                    value={newTaskAssignee}
+                    onChange={(e) => setNewTaskAssignee(e.target.value)}
                   />
                 </div>
 
