@@ -1,26 +1,84 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* Slotify Custom Colors from Original Code */
+  --color-on-secondary-fixed-variant: #204e49;
+  --color-tertiary-container: #d67901;
+  --color-on-primary-fixed-variant: #004a76;
+  --color-on-tertiary-fixed: #2e1500;
+  --color-surface-container: #1c2025;
+  --color-primary-fixed-dim: #97cbff;
+  --color-secondary-container: #22504b;
+  --color-on-tertiary-container: #422200;
+  --color-on-primary-container: #002c49;
+  --color-on-secondary-container: #93c1ba;
+  --color-on-surface-variant: #bfc7d3;
+  --color-outline-variant: #3f4851;
+  --color-on-surface: #dfe3ea;
+  --color-on-background: #dfe3ea;
+  --color-on-primary-fixed: #001d33;
+  --color-on-secondary-fixed: #00201d;
+  --color-on-tertiary-fixed-variant: #6c3a00;
+  --color-primary-container: #1197e8;
+  --color-primary: #97cbff;
+  --color-secondary: #a0d0c8;
+  --color-tertiary: #ffb778;
+  --color-background: #0b1026;
+  --color-surface: #0f1419;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-on-background);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-family: var(--font-sans);
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+}
+
+.icon-fill {
+  font-variation-settings: 'FILL' 1;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #3f4851;
+  border-radius: 9999px;
+  border: 1px solid #0f1419;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out forwards;
 }
