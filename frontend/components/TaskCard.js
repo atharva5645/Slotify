@@ -2,23 +2,23 @@
 
 export default function TaskCard({ title, date, status, priority, isDone }) {
   const priorityColors = {
-    High: "text-[#ffb4ab]",
-    Medium: "text-[#ffb778]",
-    Low: "text-[#97cbff]",
+    High: "text-red-400",
+    Medium: "text-primary",
+    Low: "text-on-surface-variant",
   };
 
   return (
-    <div className={`flex flex-col gap-2 p-4 -mx-4 rounded-xl hover:bg-[#161b33] transition-colors cursor-pointer group`}>
+    <div className={`flex flex-col gap-2 p-4 -mx-4 rounded-xl hover:bg-surface-container transition-colors cursor-pointer group`}>
       <div className="flex items-center justify-between">
-        <h3 className={`text-lg font-medium ${isDone ? 'line-through text-[#bfc7d3]' : 'text-white'}`}>
+        <h3 className={`text-lg font-medium ${isDone ? 'line-through text-on-surface-variant' : 'text-on-surface'}`}>
           {title}
         </h3>
-        {isDone && <span className="material-symbols-outlined text-[#a0d0c8]">check_circle</span>}
+        {isDone && <span className="material-symbols-outlined text-green-500">check_circle</span>}
       </div>
       
       {!isDone && (
         <>
-          <div className="flex items-center gap-4 text-sm text-[#bfc7d3]">
+          <div className="flex items-center gap-4 text-sm text-on-surface-variant">
             <div className="flex items-center gap-1">
               <span className="material-symbols-outlined text-sm">calendar_today</span>
               <span>{date}</span>
@@ -32,7 +32,7 @@ export default function TaskCard({ title, date, status, priority, isDone }) {
               </div>
             )}
           </div>
-          <div className={`flex items-center gap-2 text-sm ${priorityColors[priority] || 'text-[#bfc7d3]'}`}>
+          <div className={`flex items-center gap-2 text-sm ${priorityColors[priority] || 'text-on-surface-variant'}`}>
             <span>●</span>
             <span>{priority}</span>
           </div>

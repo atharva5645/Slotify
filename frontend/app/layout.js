@@ -22,14 +22,14 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         />
       </head>
-      <body className={`${inter.variable} font-sans antialiased bg-[#0b1026] text-white`} suppressHydrationWarning>
+      <body className={`${inter.variable} font-sans antialiased bg-background text-on-background`} suppressHydrationWarning>
         <Toaster 
           position="bottom-right"
           toastOptions={{
             style: {
-              background: '#1c2025',
-              color: '#fff',
-              border: '1px solid #2d3656',
+              background: 'var(--bg-surface)',
+              color: 'var(--text-main)',
+              border: '1px solid var(--border-main)',
               borderRadius: '12px',
               fontSize: '14px',
               fontWeight: '600'

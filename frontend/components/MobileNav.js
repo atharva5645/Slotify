@@ -15,7 +15,7 @@ export default function MobileNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="md:hidden flex justify-around items-center h-16 px-4 pb-safe fixed bottom-0 w-full z-50 rounded-t-xl bg-[#0f1419] border-t border-[#2d3656] shadow-lg">
+    <nav className="md:hidden flex justify-around items-center h-16 px-4 pb-safe fixed bottom-0 w-full z-50 rounded-t-xl bg-surface border-t border-outline shadow-lg">
       {mobileItems.map((item) => {
         const isActive = pathname === item.href;
         return (
@@ -23,7 +23,7 @@ export default function MobileNav() {
             key={item.name}
             href={item.href}
             className={`flex flex-col items-center justify-center transition-all duration-200 ${
-              isActive ? "text-[#97cbff] scale-110" : "text-[#bfc7d3] hover:text-white"
+              isActive ? "text-primary scale-110" : "text-on-surface-variant hover:text-on-surface"
             }`}
           >
             <span className={`material-symbols-outlined text-[24px] ${isActive ? "icon-fill" : ""}`}>

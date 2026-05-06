@@ -1,32 +1,59 @@
 @import "tailwindcss";
 
-@theme {
+:root {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  
+  /* Baseline Dark Theme Variables */
+  --bg-main: #0b1026;
+  --bg-surface: #0f1419;
+  --bg-surface-soft: #1c2025;
+  --text-main: #dfe3ea;
+  --text-soft: #bfc7d3;
+  --border-main: #2d3656;
+  --outline-main: #3f4851;
+  
+  /* Brand Color */
+  --brand-primary: #1197e8;
+  
+  /* Status Colors */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+}
 
-  /* Slotify Custom Colors from Original Code */
-  --color-on-secondary-fixed-variant: #204e49;
-  --color-tertiary-container: #d67901;
-  --color-on-primary-fixed-variant: #004a76;
-  --color-on-tertiary-fixed: #2e1500;
-  --color-surface-container: #1c2025;
-  --color-primary-fixed-dim: #97cbff;
-  --color-secondary-container: #22504b;
-  --color-on-tertiary-container: #422200;
-  --color-on-primary-container: #002c49;
-  --color-on-secondary-container: #93c1ba;
-  --color-on-surface-variant: #bfc7d3;
-  --color-outline-variant: #3f4851;
-  --color-on-surface: #dfe3ea;
-  --color-on-background: #dfe3ea;
-  --color-on-primary-fixed: #001d33;
-  --color-on-secondary-fixed: #00201d;
-  --color-on-tertiary-fixed-variant: #6c3a00;
-  --color-primary-container: #1197e8;
-  --color-primary: #97cbff;
-  --color-secondary: #a0d0c8;
-  --color-tertiary: #ffb778;
-  --color-background: #0b1026;
-  --color-surface: #0f1419;
+.light-theme {
+  --bg-main: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-surface-soft: #f1f5f9;
+  --text-main: #0f172a;
+  --text-soft: #475569;
+  --border-main: #e2e8f0;
+  --outline-main: #cbd5e1;
+  
+  /* Brand Color */
+  --brand-primary: #1197e8;
+  
+  /* Status Colors (Light adjustment if needed, but defaults are usually fine) */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+}
+
+@theme {
+  --font-sans: var(--font-sans);
+  --color-background: var(--bg-main);
+  --color-surface: var(--bg-surface);
+  --color-surface-container: var(--bg-surface-soft);
+  --color-on-background: var(--text-main);
+  --color-on-surface: var(--text-main);
+  --color-on-surface-variant: var(--text-soft);
+  --color-primary: var(--brand-primary);
+  --color-outline: var(--border-main);
+  --color-outline-variant: var(--outline-main);
+  
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-error: var(--color-error);
 }
 
 @layer base {
@@ -69,9 +96,31 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #3f4851;
+  background-color: var(--outline-main);
   border-radius: 9999px;
-  border: 1px solid #0f1419;
+  border: 1px solid var(--bg-surface);
+}
+
+.sidebar-active {
+  background: color-mix(in srgb, var(--brand-primary) 10%, transparent);
+  color: var(--brand-primary);
+  border-left: 4px solid var(--brand-primary);
+}
+
+.btn-primary {
+  background-color: var(--brand-primary);
+  color: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
 }
 
 @keyframes fade-in {
@@ -81,4 +130,9 @@
 
 .animate-fade-in {
   animation: fade-in 0.6s ease-out forwards;
+}
+
+/* Ensure material symbols inherit color */
+.material-symbols-outlined {
+  color: inherit;
 }

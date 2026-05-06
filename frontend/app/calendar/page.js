@@ -73,7 +73,7 @@ export default function CalendarPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#0b1026] text-white font-sans antialiased overflow-hidden h-screen">
+    <div className="flex min-h-screen bg-background text-on-background font-sans antialiased overflow-hidden h-screen">
       <Sidebar />
 
       <div className="flex-1 flex flex-col min-w-0 md:ml-64 relative h-screen">
@@ -86,72 +86,100 @@ export default function CalendarPage() {
             className="max-w-7xl mx-auto h-full flex flex-col xl:flex-row gap-6"
           >
             
-            <div className="flex-1 flex flex-col bg-[#0f1419] border border-[#2d3656] rounded-3xl p-6 shadow-2xl overflow-hidden relative">
-              <div className="absolute top-0 right-0 w-96 h-96 bg-[#1197e8]/5 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2"></div>
+            <div className="flex-1 flex flex-col bg-surface border border-outline rounded-3xl p-6 shadow-2xl overflow-hidden relative">
+              <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2"></div>
               
+              {/* AI Suggestion Banner */}
+              <motion.div 
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-6 p-4 bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/30 rounded-2xl flex items-center justify-between"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-lg">
+                    <span className="material-symbols-outlined text-white text-[18px]">psychology</span>
+                  </div>
+                  <div>
+                    <p className="text-xs font-black text-on-surface">AI Optimization Available</p>
+                    <p className="text-[10px] text-on-surface-variant">3 slots can be consolidated for 2h deep work</p>
+                  </div>
+                </div>
+                <button className="px-4 py-2 bg-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:opacity-90 transition-all">Optimize</button>
+              </motion.div>
+
               <div className="flex justify-between items-center mb-8 shrink-0 relative z-10">
-                <div className="flex items-center gap-2 bg-[#1c2025] border border-[#2d3656] rounded-xl p-1">
+                <div className="flex items-center gap-2 bg-surface-container border border-outline rounded-xl p-1">
                   <button 
                     onClick={() => shiftWeek(-1)}
-                    className="p-1 text-[#bfc7d3] hover:text-white transition-colors"
+                    className="p-1 text-on-surface-variant hover:text-on-surface transition-colors"
                   >
                     <span className="material-symbols-outlined text-[20px]">chevron_left</span>
                   </button>
-                  <span className="text-sm font-black px-4 min-w-[180px] text-center tracking-tight">
+                  <span className="text-sm font-black px-4 min-w-[180px] text-center tracking-tight text-on-surface">
                     {formatRange(currentWeekStart)}
                   </span>
                   <button 
                     onClick={() => shiftWeek(1)}
-                    className="p-1 text-[#bfc7d3] hover:text-white transition-colors"
+                    className="p-1 text-on-surface-variant hover:text-on-surface transition-colors"
                   >
                     <span className="material-symbols-outlined text-[20px]">chevron_right</span>
                   </button>
                 </div>
-                <div className="flex gap-2">
-                  <button 
-                    onClick={() => setIsEditMode(!isEditMode)}
-                    className={`px-6 py-2 border rounded-xl text-sm font-bold transition-all flex items-center gap-2 group shadow-sm
-                      ${isEditMode ? 'bg-[#1197e8] border-[#1197e8] text-white' : 'bg-[#1c2025] border-[#2d3656] text-[#bfc7d3] hover:bg-[#31353b]'}`}
-                  >
-                    <span className={`material-symbols-outlined text-[18px] transition-transform ${isEditMode ? 'rotate-0' : 'group-hover:rotate-12'}`}>
-                      {isEditMode ? 'check_circle' : 'edit'}
-                    </span>
-                    {isEditMode ? 'Finish Editing' : 'Edit Mode'}
-                  </button>
-                  <button 
-                    onClick={() => setCurrentWeekStart(new Date(2024, 9, 21))}
-                    className="px-4 py-2 bg-[#1c2025] border border-[#2d3656] rounded-xl text-sm font-bold hover:bg-[#31353b] transition-colors"
-                  >
-                    Today
-                  </button>
+                
+                <div className="flex items-center gap-4">
+                  {/* Team Avatars */}
+                  <div className="flex -space-x-2 mr-4">
+                    {['AM', 'SC', 'JD'].map((m, i) => (
+                      <div key={i} className="w-7 h-7 rounded-full bg-surface-container border-2 border-surface flex items-center justify-center text-[9px] font-black text-on-surface-variant">{m}</div>
+                    ))}
+                    <button className="w-7 h-7 rounded-full bg-primary/20 border-2 border-surface flex items-center justify-center text-[9px] font-black text-primary hover:bg-primary hover:text-white transition-all">+</button>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => setIsEditMode(!isEditMode)}
+                      className={`px-6 py-2 border rounded-xl text-sm font-bold transition-all flex items-center gap-2 group shadow-sm
+                        ${isEditMode ? 'bg-primary border-primary text-white' : 'bg-surface-container border-outline text-on-surface-variant hover:bg-surface-container/80'}`}
+                    >
+                      <span className={`material-symbols-outlined text-[18px] transition-transform ${isEditMode ? 'rotate-0' : 'group-hover:rotate-12'}`}>
+                        {isEditMode ? 'check_circle' : 'edit'}
+                      </span>
+                      {isEditMode ? 'Finish Editing' : 'Edit Mode'}
+                    </button>
+                  </div>
                 </div>
               </div>
 
-              <div className="flex-1 flex flex-col overflow-x-auto custom-scrollbar border border-[#2d3656] rounded-2xl bg-[#0b1026] relative z-10">
+              <div className="flex-1 flex flex-col overflow-x-auto custom-scrollbar border border-outline rounded-2xl bg-background relative z-10">
                 {/* Header Grid */}
-                <div className="grid grid-cols-[60px_repeat(5,1fr)] min-w-[800px] bg-[#0f1419] border-b border-[#2d3656]">
-                  <div className="p-4 border-r border-[#2d3656] flex items-end justify-center">
-                    <span className="text-[9px] font-black text-[#bfc7d3] uppercase tracking-widest">Time</span>
+                <div className="grid grid-cols-[60px_repeat(5,1fr)] min-w-[800px] bg-surface border-b border-outline">
+                  <div className="p-4 border-r border-outline flex items-end justify-center">
+                    <span className="text-[9px] font-black text-on-surface-variant uppercase tracking-widest">Time</span>
                   </div>
                   {days.map((day, idx) => {
                     const dateNum = getDayDate(idx);
                     return (
-                      <div key={day} className="p-4 flex flex-col items-center justify-center gap-1 border-r border-[#2d3656] last:border-r-0">
-                        <span className={`text-[10px] font-black uppercase tracking-widest ${idx === 1 ? 'text-[#1197e8]' : 'text-[#bfc7d3]'}`}>{day}</span>
-                        <span className={`text-2xl font-black ${idx === 1 ? 'text-[#1197e8]' : ''}`}>{dateNum}</span>
+                      <div key={day} className="p-4 flex flex-col items-center justify-center gap-1 border-r border-outline last:border-r-0">
+                        <span className={`text-[10px] font-black uppercase tracking-widest ${idx === 1 ? 'text-primary' : 'text-on-surface-variant'}`}>{day}</span>
+                        <span className={`text-2xl font-black text-on-surface ${idx === 1 ? 'text-primary' : ''}`}>{dateNum}</span>
+                        <div className="flex gap-0.5 mt-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-success/50"></div>
+                          <div className="w-1.5 h-1.5 rounded-full bg-primary/50"></div>
+                          <div className="w-1.5 h-1.5 rounded-full bg-warning/50"></div>
+                        </div>
                       </div>
                     );
                   })}
                 </div>
 
                 {/* Scrollable Body */}
-                <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar bg-[#0b1026] min-w-[800px]">
-                  <div className="grid grid-cols-[60px_repeat(5,1fr)] gap-[1px] bg-[#2d3656]/30 relative">
+                <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar bg-background min-w-[800px]">
+                  <div className="grid grid-cols-[60px_repeat(5,1fr)] gap-[1px] bg-outline/20 relative">
                     {/* Time labels column */}
                     <div className="flex flex-col">
                       {times.map((time) => (
-                        <div key={time} className="h-[100px] bg-[#0f1419] border-b border-[#2d3656]/50 flex items-start justify-center p-3">
-                          <span className="text-[10px] font-black text-[#bfc7d3]">{time}</span>
+                        <div key={time} className="h-[100px] bg-surface border-b border-outline/50 flex items-start justify-center p-3">
+                          <span className="text-[10px] font-black text-on-surface-variant">{time}</span>
                         </div>
                       ))}
                     </div>
@@ -166,10 +194,10 @@ export default function CalendarPage() {
                       });
 
                       return (
-                        <div key={dayIdx} className="relative h-[1000px] bg-[#0f1419] border-r border-[#2d3656]/50 last:border-r-0">
+                        <div key={dayIdx} className="relative h-[1000px] bg-surface border-r border-outline/50 last:border-r-0">
                           {/* Background Grid Lines */}
                           {times.map((t) => (
-                            <div key={t} className="h-[100px] border-b border-[#2d3656]/10"></div>
+                            <div key={t} className="h-[100px] border-b border-outline/10"></div>
                           ))}
 
                           {/* Events Overlay */}
@@ -196,9 +224,9 @@ export default function CalendarPage() {
                                     right: '4px'
                                   }}
                                   className={`absolute rounded-xl p-3 flex flex-col gap-1 transition-all group/item shadow-xl border cursor-pointer backdrop-blur-md
-                                    ${event.type === 'smart' ? 'bg-[#1197e8]/20 border-[#1197e8]/40 text-[#97cbff] hover:bg-[#1197e8]/30' : 
-                                      event.type === 'priority' ? 'bg-[#ffb778]/20 border-[#ffb778]/40 text-[#ffb778] hover:bg-[#ffb778]/30' : 
-                                      'bg-[#1c2025]/80 border-[#2d3656] text-white hover:bg-[#252a31]'}
+                                    ${event.type === 'smart' ? 'bg-primary/20 border-primary/40 text-primary hover:bg-primary/30' : 
+                                      event.type === 'priority' ? 'bg-warning/20 border-warning/40 text-warning hover:bg-warning/30' : 
+                                      'bg-surface-container/80 border-outline text-on-surface hover:bg-surface-container'}
                                     z-10
                                   `}
                                 >
@@ -209,22 +237,28 @@ export default function CalendarPage() {
                                         {event.type === 'smart' ? 'Smart' : event.type}
                                       </span>
                                     </div>
-                                    <div className={`flex gap-1 transition-opacity ${isEditMode ? 'opacity-100' : 'opacity-0 group-hover/item:opacity-100'}`}>
-                                      <button className="p-0.5 hover:bg-white/10 rounded">
-                                        <span className="material-symbols-outlined text-[12px]">edit</span>
-                                      </button>
+                                    <div className={`flex gap-1 items-center transition-opacity ${isEditMode ? 'opacity-100' : 'opacity-0 group-hover/item:opacity-100'}`}>
+                                      <div className="flex -space-x-1 mr-2">
+                                        <div className="w-4 h-4 rounded-full bg-outline border border-surface flex items-center justify-center text-[6px] font-black">AM</div>
+                                      </div>
                                       <button 
                                         onClick={(e) => { e.stopPropagation(); deleteEvent(event.id); }} 
-                                        className="p-0.5 hover:bg-red-500/20 text-red-400 rounded"
+                                        className="p-0.5 hover:bg-red-500/20 text-red-500 rounded"
                                       >
                                         <span className="material-symbols-outlined text-[12px]">delete</span>
                                       </button>
                                     </div>
                                   </div>
-                                  <span className="text-xs font-black text-white line-clamp-1">{event.title}</span>
-                                  {duration >= 0.5 && (
-                                    <span className="text-[8px] font-bold opacity-60 mt-auto">{event.start} - {event.end}</span>
-                                  )}
+                                  <span className="text-xs font-black text-on-surface line-clamp-1">{event.title}</span>
+                                  <div className="flex items-center justify-between mt-auto">
+                                    {duration >= 0.5 && (
+                                      <span className="text-[8px] font-bold opacity-60 uppercase">{event.start} - {event.end}</span>
+                                    )}
+                                    <div className="flex items-center gap-1 opacity-0 group-hover/item:opacity-100 transition-opacity">
+                                      <span className="material-symbols-outlined text-[10px]">chat</span>
+                                      <span className="text-[8px] font-black text-on-surface">2</span>
+                                    </div>
+                                  </div>
                                 </motion.div>
                               );
                             })}
@@ -236,10 +270,10 @@ export default function CalendarPage() {
                               key={`add-${time}`}
                               onClick={() => handleSlotClick(dayIdx, time)}
                               style={{ top: `${(parseInt(time.split(':')[0]) - 9) * 100}px` }}
-                              className={`absolute left-0 right-0 h-[100px] flex items-center justify-center transition-all bg-[#1197e8]/5 opacity-0 hover:opacity-100 z-0
+                              className={`absolute left-0 right-0 h-[100px] flex items-center justify-center transition-all bg-primary/5 opacity-0 hover:opacity-100 z-0
                                 ${isEditMode ? 'opacity-100' : ''}`}
                             >
-                              <span className="material-symbols-outlined text-[#1197e8] text-[20px]">add_circle</span>
+                              <span className="material-symbols-outlined text-primary text-[20px]">add_circle</span>
                             </button>
                           ))}
                         </div>
@@ -255,23 +289,23 @@ export default function CalendarPage() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => handleSlotClick(0, "14:00")} 
-                className="w-full bg-[#1197e8] text-white hover:bg-[#0088cc] transition-all py-4 px-6 rounded-3xl flex items-center justify-center gap-2 font-black shadow-xl shadow-[#1197e8]/20"
+                className="w-full bg-primary text-white hover:opacity-90 transition-all py-4 px-6 rounded-3xl flex items-center justify-center gap-2 font-black shadow-xl shadow-primary/20"
               >
                 <span className="material-symbols-outlined text-[24px]">add</span>
                 <span className="text-lg">Quick Add Slot</span>
               </motion.button>
 
-              <div className="bg-[#0f1419] border border-[#2d3656] rounded-3xl p-8 flex-1 shadow-2xl flex flex-col relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-1 bg-[#1197e8]"></div>
-                <div className="flex items-center justify-between mb-8 border-b border-[#2d3656] pb-4 shrink-0">
-                  <h3 className="text-lg font-black">Reminders</h3>
-                  <span className="bg-[#1197e8]/10 text-[#1197e8] text-[10px] font-black px-2 py-1 rounded-full border border-[#1197e8]/20">3 Active</span>
+              <div className="bg-surface border border-outline rounded-3xl p-8 flex-1 shadow-2xl flex flex-col relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-primary"></div>
+                <div className="flex items-center justify-between mb-8 border-b border-outline pb-4 shrink-0">
+                  <h3 className="text-lg font-black text-on-surface">Reminders</h3>
+                  <span className="bg-primary/10 text-primary text-[10px] font-black px-2 py-1 rounded-full border border-primary/20">3 Active</span>
                 </div>
                 <div className="flex flex-col gap-6 overflow-y-auto flex-1 custom-scrollbar pr-2">
                   {[
-                    { title: "Weekly Report", time: "5:00 PM", status: "pending", color: "bg-[#a0d0c8]" },
-                    { title: "Review PR #402", time: "Overdue", status: "overdue", color: "bg-red-400" },
-                    { title: "Team Capacity", time: "EOD", status: "pending", color: "bg-[#ffb778]" }
+                    { title: "Weekly Report", time: "5:00 PM", status: "pending", color: "bg-primary" },
+                    { title: "Review PR #402", time: "Overdue", status: "overdue", color: "bg-error" },
+                    { title: "Team Capacity", time: "EOD", status: "pending", color: "bg-warning" }
                   ].map((reminder, idx) => (
                     <motion.div 
                       whileHover={{ x: 5 }}
@@ -280,17 +314,17 @@ export default function CalendarPage() {
                     >
                       <div className={`mt-1.5 w-2 h-2 rounded-full ${reminder.color} shadow-sm group-hover:scale-150 transition-transform`}></div>
                       <div className="flex flex-col gap-1">
-                        <span className={`text-sm font-bold ${reminder.status === 'overdue' ? 'text-red-400' : 'group-hover:text-[#1197e8]'} transition-colors`}>{reminder.title}</span>
-                        <span className="text-[10px] font-black text-[#bfc7d3] uppercase tracking-widest">{reminder.time}</span>
+                        <span className={`text-sm font-bold ${reminder.status === 'overdue' ? 'text-error' : 'text-on-surface group-hover:text-primary'} transition-colors`}>{reminder.title}</span>
+                        <span className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest">{reminder.time}</span>
                       </div>
                     </motion.div>
                   ))}
                 </div>
 
-                <div className="mt-8 pt-8 border-t border-[#2d3656] shrink-0">
+                <div className="mt-8 pt-8 border-t border-outline shrink-0">
                   <div className="grid grid-cols-7 gap-1 text-center">
                     {["M", "T", "W", "T", "F", "S", "S"].map((d, i) => (
-                      <div key={`${d}-${i}`} className="text-[9px] font-black text-[#bfc7d3] mb-2">{d}</div>
+                      <div key={`${d}-${i}`} className="text-[9px] font-black text-on-surface-variant mb-2">{d}</div>
                     ))}
                     {[...Array(14)].map((_, i) => {
                       const dayNumber = 17 + i;
@@ -300,7 +334,7 @@ export default function CalendarPage() {
                           key={i} 
                           onClick={() => setSelectedDate(dayNumber)}
                           className={`w-8 h-8 mx-auto rounded-xl flex items-center justify-center text-[10px] font-black transition-all
-                          ${isSelected ? 'bg-[#1197e8] text-white shadow-lg' : 'text-[#bfc7d3] hover:bg-[#161b33]'}`}
+                          ${isSelected ? 'bg-primary text-white shadow-lg' : 'text-on-surface-variant hover:bg-surface-container'}`}
                         >
                           {dayNumber}
                         </button>
@@ -320,24 +354,24 @@ export default function CalendarPage() {
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                className="bg-[#0f1419] border border-[#2d3656] w-full max-w-md rounded-3xl p-8 shadow-2xl relative overflow-hidden"
+                className="bg-surface border border-outline w-full max-w-md rounded-3xl p-8 shadow-2xl relative overflow-hidden"
               >
-                <div className="absolute top-0 left-0 w-full h-1 bg-[#1197e8]"></div>
+                <div className="absolute top-0 left-0 w-full h-1 bg-primary"></div>
                 <button 
                   onClick={() => setEditingEvent(null)}
-                  className="absolute right-6 top-6 text-[#bfc7d3] hover:text-white transition-colors"
+                  className="absolute right-6 top-6 text-on-surface-variant hover:text-on-surface transition-colors"
                 >
                   <span className="material-symbols-outlined">close</span>
                 </button>
                 
-                <h3 className="text-2xl font-black mb-8 tracking-tight">{editingEvent.id ? 'Edit Slot' : 'New Slot'}</h3>
+                <h3 className="text-2xl font-black mb-8 tracking-tight text-on-surface">{editingEvent.id ? 'Edit Slot' : 'New Slot'}</h3>
                 
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-[#bfc7d3] uppercase tracking-widest">Title</label>
+                    <label className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest">Title</label>
                     <input 
                       autoFocus
-                      className="w-full bg-[#1c2025] border border-[#2d3656] rounded-2xl p-4 text-white focus:border-[#1197e8] outline-none transition-colors font-bold" 
+                      className="w-full bg-surface-container border border-outline rounded-2xl p-4 text-on-surface focus:border-primary outline-none transition-colors font-bold" 
                       placeholder="Slot title..."
                       value={editingEvent.title}
                       onChange={(e) => setEditingEvent({...editingEvent, title: e.target.value})}
@@ -346,19 +380,19 @@ export default function CalendarPage() {
                   
                   <div className="grid grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black text-[#bfc7d3] uppercase tracking-widest">Start</label>
+                      <label className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest">Start</label>
                       <input 
                         type="time"
-                        className="w-full bg-[#1c2025] border border-[#2d3656] rounded-2xl p-4 text-white focus:border-[#1197e8] outline-none font-bold" 
+                        className="w-full bg-surface-container border border-outline rounded-2xl p-4 text-on-surface focus:border-primary outline-none font-bold" 
                         value={editingEvent.start}
                         onChange={(e) => setEditingEvent({...editingEvent, start: e.target.value})}
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black text-[#bfc7d3] uppercase tracking-widest">End</label>
+                      <label className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest">End</label>
                       <input 
                         type="time"
-                        className="w-full bg-[#1c2025] border border-[#2d3656] rounded-2xl p-4 text-white focus:border-[#1197e8] outline-none font-bold" 
+                        className="w-full bg-surface-container border border-outline rounded-2xl p-4 text-on-surface focus:border-primary outline-none font-bold" 
                         value={editingEvent.end}
                         onChange={(e) => setEditingEvent({...editingEvent, end: e.target.value})}
                       />
@@ -366,7 +400,7 @@ export default function CalendarPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-[#bfc7d3] uppercase tracking-widest">Type</label>
+                    <label className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest">Type</label>
                     <div className="grid grid-cols-3 gap-2">
                       {['meeting', 'smart', 'priority'].map(type => (
                         <button
@@ -375,8 +409,8 @@ export default function CalendarPage() {
                           onClick={() => setEditingEvent({...editingEvent, type})}
                           className={`py-3 px-2 rounded-xl border text-[9px] font-black uppercase tracking-widest transition-all
                             ${editingEvent.type === type 
-                              ? 'bg-[#1197e8] border-[#1197e8] text-white shadow-lg' 
-                              : 'bg-[#1c2025] border-[#2d3656] text-[#bfc7d3] hover:border-[#3f4851]'}`}
+                              ? 'bg-primary border-primary text-white shadow-lg' 
+                              : 'bg-surface-container border-outline text-on-surface-variant hover:border-on-surface-variant'}`}
                         >
                           {type}
                         </button>
@@ -387,13 +421,13 @@ export default function CalendarPage() {
                   <div className="flex gap-4 pt-6">
                     <button 
                       onClick={() => setEditingEvent(null)}
-                      className="flex-1 py-4 text-[#bfc7d3] font-black text-sm uppercase tracking-widest hover:text-white transition-colors"
+                      className="flex-1 py-4 text-on-surface-variant font-black text-sm uppercase tracking-widest hover:text-on-surface transition-colors"
                     >
                       Cancel
                     </button>
                     <button 
                       onClick={() => saveEvent(editingEvent)}
-                      className="flex-1 bg-[#1197e8] text-white py-4 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-[#1197e8]/20 active:scale-95 transition-all"
+                      className="flex-1 bg-primary text-white py-4 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-primary/20 active:scale-95 transition-all"
                     >
                       {editingEvent.id ? 'Update' : 'Create'}
                     </button>
