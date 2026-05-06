@@ -8,7 +8,6 @@ const navItems = [
   { name: "Meetings", href: "/meetings/create", icon: "groups" },
   { name: "Tasks", href: "/tasks", icon: "assignment" },
   { name: "Calendar", href: "/calendar", icon: "calendar_today" },
-  { name: "Team", href: "/team", icon: "group" },
 ];
 
 export default function Sidebar() {

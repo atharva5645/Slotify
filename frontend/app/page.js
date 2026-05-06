@@ -124,17 +124,87 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+
+
+        {/* Pricing Section */}
+        <section id="pricing" className="max-w-7xl mx-auto px-6 py-32 border-t border-[#2d3656]/50">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4">Choose Your Pace</h2>
+            <p className="text-xl text-[#bfc7d3]">Simple, transparent pricing for teams of all sizes.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { name: "Starter", price: "0", features: ["Up to 5 Smart Slots", "Basic Tasks", "Community Support"], color: "border-[#2d3656]" },
+              { name: "Pro", price: "12", features: ["Unlimited Smart Slots", "Team Sync", "Advanced Analytics", "Priority Support"], color: "border-[#1197e8] bg-[#1197e8]/5 shadow-[0_0_50px_rgba(17,151,232,0.1)]", popular: true },
+              { name: "Enterprise", price: "Custom", features: ["SSO & Security", "Custom Integrations", "Dedicated Manager", "SLA Guarantee"], color: "border-[#2d3656]" }
+            ].map((plan) => (
+              <div key={plan.name} className={`p-10 rounded-3xl border flex flex-col ${plan.color} relative transition-all hover:scale-[1.02]`}>
+                {plan.popular && (
+                  <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#1197e8] text-white text-[10px] font-black uppercase tracking-widest px-4 py-1 rounded-full shadow-lg">Most Popular</span>
+                )}
+                <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
+                <div className="flex items-baseline gap-1 mb-8">
+                  <span className="text-4xl font-black">${plan.price}</span>
+                  {plan.price !== "Custom" && <span className="text-[#bfc7d3]">/mo</span>}
+                </div>
+                <ul className="space-y-4 mb-10 flex-1">
+                  {plan.features.map(f => (
+                    <li key={f} className="flex items-center gap-3 text-sm text-[#bfc7d3]">
+                      <span className="material-symbols-outlined text-[18px] text-[#1197e8]">check_circle</span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/login" className={`w-full py-4 rounded-xl text-center font-bold transition-all active:scale-95 ${plan.popular ? 'bg-[#1197e8] text-white' : 'bg-[#1c2025] text-white hover:bg-[#252a31]'}`}>
+                  {plan.price === "Custom" ? "Contact Sales" : "Get Started"}
+                </Link>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="bg-gradient-to-br from-[#1197e8] to-[#004a76] py-24 text-center px-6">
+          <h2 className="text-4xl md:text-5xl font-black mb-6">Ready to reclaim your time?</h2>
+          <p className="text-xl text-white/80 max-w-2xl mx-auto mb-10">Join 10,000+ high-performance teams already using Slotify to master their workflows.</p>
+          <Link href="/login" className="bg-white text-[#1197e8] px-10 py-5 rounded-full text-xl font-bold hover:shadow-2xl transition-all inline-block active:scale-95">
+            Create Your Account
+          </Link>
+        </section>
       </main>
 
-      <footer className="border-t border-[#2d3656] py-12 bg-[#0f1419]">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="text-2xl font-bold">Slotify</div>
-          <div className="flex gap-8 text-sm text-[#bfc7d3]">
-            <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
-            <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
-            <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
+      <footer className="border-t border-[#2d3656] py-16 bg-[#0b1026]">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
+          <div className="md:col-span-1">
+            <Link href="/" className="text-2xl font-bold flex items-center gap-2 mb-6">
+              <span className="material-symbols-outlined text-[#1197e8] icon-fill">all_inclusive</span>
+              <span>Slotify</span>
+            </Link>
+            <p className="text-sm text-[#bfc7d3] leading-relaxed">The next generation scheduling environment for high-performance teams.</p>
           </div>
-          <div className="text-sm text-[#bfc7d3]">© 2024 Slotify Inc.</div>
+          <div className="grid grid-cols-2 md:col-span-3 gap-8">
+            <div className="space-y-4">
+              <h4 className="font-bold text-sm uppercase tracking-widest text-white">Product</h4>
+              <nav className="flex flex-col gap-2 text-sm text-[#bfc7d3]">
+                <Link href="#" className="hover:text-white">Features</Link>
+                <Link href="#" className="hover:text-white">Integrations</Link>
+                <Link href="#" className="hover:text-white">Pricing</Link>
+                <Link href="#" className="hover:text-white">API</Link>
+              </nav>
+            </div>
+            <div className="space-y-4">
+              <h4 className="font-bold text-sm uppercase tracking-widest text-white">Company</h4>
+              <nav className="flex flex-col gap-2 text-sm text-[#bfc7d3]">
+                <Link href="#" className="hover:text-white">About</Link>
+                <Link href="#" className="hover:text-white">Privacy</Link>
+                <Link href="#" className="hover:text-white">Terms</Link>
+                <Link href="#" className="hover:text-white">Contact</Link>
+              </nav>
+            </div>
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-[#2d3656]/50 text-center text-sm text-[#bfc7d3]">
+          © 2024 Slotify Inc. Built with passion for productivity.
         </div>
       </footer>
     </div>
