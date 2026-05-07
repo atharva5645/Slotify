@@ -6,6 +6,7 @@ import { useState } from "react";
 
 const navItems = [
   { name: "Dashboard", href: "/dashboard", icon: "grid_view" },
+  { name: "Discussions", href: "/discussions", icon: "forum" },
   { name: "Calendar", href: "/calendar", icon: "calendar_today" },
   { name: "Meetings", href: "/meetings/create", icon: "groups" },
   { name: "Tasks", href: "/tasks", icon: "assignment" },
@@ -21,9 +22,9 @@ export default function Sidebar() {
       <div className="p-6 shrink-0">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-lg">
-            <span className="material-symbols-outlined text-white text-[20px] font-bold">dataset</span>
+            <span className="material-symbols-outlined text-white text-[20px] font-bold">event_available</span>
           </div>
-          <span className="text-xl font-black text-on-surface tracking-tighter uppercase">Slotify</span>
+          <span className="text-xl font-black text-on-surface tracking-tighter">Slotify</span>
         </div>
 
         {/* Workspace Switcher */}

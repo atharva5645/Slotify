@@ -4,8 +4,10 @@ import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import MobileNav from "@/components/MobileNav";
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-hot-toast";
+import { createTask, getTasksForUser } from "@/lib/tasks/taskService";
 
 export default function TasksPage() {
   const [loading, setLoading] = useState(true);
@@ -14,17 +16,42 @@ export default function TasksPage() {
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskPriority, setNewTaskPriority] = useState("medium");
   const [newTaskAssignee, setNewTaskAssignee] = useState("");
-  const [tasks, setTasks] = useState([
-    { id: 1, title: "Design System Update", priority: "high", status: "todo", duration: "4h", category: "Design", assignee: "Alex Carter" },
-    { id: 2, title: "Fix Dashboard Sidebar", priority: "medium", status: "in-progress", duration: "2h", category: "Dev", assignee: "Sarah Lee" },
-    { id: 3, title: "Client Presentation", priority: "urgent", status: "todo", duration: "1h", category: "Business", assignee: "John Doe" },
-    { id: 4, title: "Database Migration", priority: "high", status: "completed", duration: "6h", category: "Dev", assignee: "Alex Carter" },
-    { id: 5, title: "User Feedback Loop", priority: "low", status: "in-progress", duration: "3h", category: "Product", assignee: "Sarah Lee" },
-  ]);
+  const [tasks, setTasks] = useState([]);
+  const [hasMounted, setHasMounted] = useState(false);
+  const MOCK_USER_ID = "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"; // Alex Carter from seed.sql
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 600);
-    return () => clearTimeout(timer);
+    setHasMounted(true);
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadTasks() {
+      try {
+        setLoading(true);
+        // Resolve the board from a single task query.
+        const data = await getTasksForUser(MOCK_USER_ID);
+        if (isMounted) {
+          setTasks(data);
+        }
+      } catch (err) {
+        console.error("Fetch error:", err);
+        if (isMounted) {
+          toast.error("Failed to load tasks");
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadTasks();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const columns = [
@@ -49,32 +76,58 @@ export default function TasksPage() {
     low: 3
   };
 
+  const tasksByColumn = columns.reduce((acc, column) => {
+    acc[column.id] = tasks
+      .filter((task) => task.status === column.id)
+      .sort((a, b) => priorityWeight[a.priority] - priorityWeight[b.priority]);
+    return acc;
+  }, {});
+
   const addTask = (status) => {
     setModalStatus(status);
     setIsModalOpen(true);
   };
 
-  const confirmAddTask = () => {
+  const confirmAddTask = async () => {
     if (!newTaskTitle.trim()) {
       toast.error("Please enter a task title");
       return;
     }
 
-    const newTask = { 
-      id: Date.now(), 
+    const taskData = { 
       title: newTaskTitle, 
       priority: newTaskPriority, 
       status: modalStatus, 
-      duration: "1h", 
-      category: "Product",
-      assignee: newTaskAssignee || "Unassigned"
+      assignedBy: MOCK_USER_ID,
+      assignedTo: MOCK_USER_ID, // Simplified: assigning to self for demo
+      meetingId: null
     };
 
-    setTasks(prev => [...prev, newTask]);
-    setIsModalOpen(false);
-    setNewTaskTitle("");
-    setNewTaskPriority("medium");
-    setNewTaskAssignee("");
+    try {
+      // Direct call to client-side task creation (Firestore)
+      const createdTask = await createTask(taskData);
+      
+      setTasks(prev => [...prev, createdTask]);
+      setIsModalOpen(false);
+      setNewTaskTitle("");
+      setNewTaskPriority("medium");
+      setNewTaskAssignee("");
+
+      toast.success(`Task synced to Firebase`, {
+        icon: '☁️',
+        style: {
+          borderRadius: '10px',
+          background: 'var(--surface-container)',
+          color: 'var(--on-surface)',
+          border: '1px solid var(--outline)',
+          fontSize: '12px',
+          fontWeight: 'bold'
+        }
+      });
+    } catch (err) {
+      console.error("Task error:", err);
+      toast.error(`Firebase Error: ${err.message}`);
+    }
 
     toast.success(`Task added to ${modalStatus}`, {
       icon: '🚀',
@@ -112,6 +165,48 @@ export default function TasksPage() {
         <Header title="Tasks Board" />
 
         <main className="flex-1 overflow-x-auto custom-scrollbar p-6">
+          {/* Workspace Performance Summary */}
+          <div className="mb-10 max-w-7xl">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-4">
+              <div>
+                <h2 className="text-sm font-black uppercase tracking-[0.2em] text-on-surface-variant mb-2">Workspace Performance</h2>
+                <div className="flex items-baseline gap-3">
+                  <span className="text-5xl font-black text-on-surface tracking-tighter">
+                    {tasks.length > 0 ? Math.round(
+                      ((tasks.filter(t => t.status === 'completed').length * 1.0) + 
+                       (tasks.filter(t => t.status === 'in-progress').length * 0.5)) / tasks.length * 100
+                    ) : 0}%
+                  </span>
+                  <span className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Total Progress</span>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="px-6 py-4 rounded-3xl bg-surface-container border border-outline flex flex-col gap-1">
+                  <span className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest">Active Tasks</span>
+                  <span className="text-xl font-black text-on-surface">{tasks.filter(t => t.status !== 'completed').length}</span>
+                </div>
+                <div className="px-6 py-4 rounded-3xl bg-surface-container border border-outline flex flex-col gap-1">
+                  <span className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest">Completed</span>
+                  <span className="text-xl font-black text-success">{tasks.filter(t => t.status === 'completed').length}</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Master Progress Bar */}
+            <div className="h-3 w-full bg-surface-container border border-outline rounded-full overflow-hidden relative shadow-inner">
+               <motion.div 
+                 initial={{ width: 0 }}
+                 animate={{ width: `${tasks.length > 0 ? 
+                   ((tasks.filter(t => t.status === 'completed').length * 1.0) + 
+                    (tasks.filter(t => t.status === 'in-progress').length * 0.5)) / tasks.length * 100 : 0}%` }}
+                 transition={{ duration: 1, ease: "easeOut" }}
+                 className="h-full bg-gradient-to-r from-primary to-primary-container relative"
+               >
+                  <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.15)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.15)_50%,rgba(255,255,255,0.15)_75%,transparent_75%,transparent)] bg-[size:20px_20px] opacity-20"></div>
+               </motion.div>
+            </div>
+          </div>
+
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -131,7 +226,7 @@ export default function TasksPage() {
                     <h2 className="text-xs font-black uppercase tracking-widest text-on-surface-variant">{col.name}</h2>
                   </div>
                   <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-surface-container text-on-surface-variant border border-outline">
-                    {tasks.filter(t => t.status === col.id).length}
+                    {tasksByColumn[col.id]?.length || 0}
                   </span>
                 </div>
 
@@ -143,7 +238,7 @@ export default function TasksPage() {
                       ))
                     ) : (
                       <>
-                        {tasks.filter(t => t.status === col.id).length === 0 ? (
+                        {tasksByColumn[col.id]?.length === 0 ? (
                           <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
                             <div className="w-16 h-16 bg-surface rounded-full flex items-center justify-center mb-4 border border-outline/50">
                               <span className="material-symbols-outlined text-on-surface-variant text-[32px]">assignment_turned_in</span>
@@ -153,10 +248,7 @@ export default function TasksPage() {
                             <button onClick={() => addTask(col.id)} className="text-xs font-black text-primary hover:underline uppercase tracking-tighter">Create First Task</button>
                           </div>
                         ) : (
-                          tasks
-                            .filter(t => t.status === col.id)
-                            .sort((a, b) => priorityWeight[a.priority] - priorityWeight[b.priority])
-                            .map((task) => (
+                          tasksByColumn[col.id].map((task) => (
                             <motion.div 
                               layout
                               initial={{ scale: 0.9, opacity: 0 }}
@@ -203,175 +295,114 @@ export default function TasksPage() {
                     )}
                   </AnimatePresence>
                   
-                  {!loading && (
-                    <button 
-                      onClick={() => addTask(col.id)}
-                      className="w-full py-4 rounded-2xl border border-dashed border-outline text-on-surface-variant text-[10px] font-black uppercase tracking-widest hover:border-primary hover:text-primary hover:bg-primary/5 transition-all group"
-                    >
-                      <span className="flex items-center justify-center gap-2">
-                        <span className="material-symbols-outlined text-[16px] group-hover:rotate-90 transition-transform">add</span>
-                        New Task
-                      </span>
-                    </button>
-                  )}
+                  <button 
+                    onClick={() => addTask(col.id)}
+                    className="w-full py-4 rounded-2xl border border-dashed border-outline text-on-surface-variant text-[10px] font-black uppercase tracking-widest hover:border-primary hover:text-primary hover:bg-primary/5 transition-all group mt-2"
+                  >
+                    <span className="flex items-center justify-center gap-2">
+                      <span className="material-symbols-outlined text-[16px] group-hover:rotate-90 transition-transform">add</span>
+                      New Task
+                    </span>
+                  </button>
                 </div>
               </motion.div>
             ))}
           </motion.div>
 
 
-          {/* Right Column: Discussion Panel */}
-          <div className="hidden xl:flex w-[320px] flex-col gap-6 sticky top-0 h-full">
-            <div className="bg-surface border border-outline rounded-3xl p-6 shadow-sm flex flex-col flex-1">
-              <div className="flex items-center justify-between mb-8 pb-4 border-b border-outline">
-                <h3 className="font-bold flex items-center gap-2 text-on-surface">
-                  <span className="material-symbols-outlined text-primary">forum</span>
-                  Discussion
-                </h3>
-                <span className="text-[10px] font-black text-success uppercase tracking-widest">3 Active</span>
-              </div>
-
-              <div className="flex-1 overflow-y-auto custom-scrollbar space-y-6 pr-2">
-                {[
-                  { user: "Sarah Lee", text: "Has anyone reviewed the Q4 plan?", time: "2m ago" },
-                  { user: "Alex Mercer", text: "I'll take a look after lunch.", time: "15m ago" },
-                  { user: "John Doe", text: "Need the Figma links updated.", time: "1h ago" },
-                ].map((msg, i) => (
-                  <div key={i} className="flex gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-surface-container border border-outline flex items-center justify-center shrink-0 font-black text-[10px] text-on-surface-variant">
-                      {msg.user[0]}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-bold text-on-surface">{msg.user}</span>
-                        <span className="text-[9px] font-black text-on-surface-variant uppercase">{msg.time}</span>
-                      </div>
-                      <p className="text-[11px] text-on-surface-variant leading-relaxed bg-surface-container/50 p-3 rounded-2xl rounded-tl-none border border-outline/30">
-                        {msg.text}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-6 pt-6 border-t border-outline">
-                <div className="relative">
-                  <input 
-                    type="text" 
-                    placeholder="Type a message..."
-                    className="w-full bg-surface-container border border-outline rounded-xl py-3 pl-4 pr-10 text-xs font-bold outline-none focus:border-primary transition-colors"
-                  />
-                  <button className="absolute right-3 top-1/2 -translate-y-1/2 text-primary hover:text-on-surface transition-colors">
-                    <span className="material-symbols-outlined text-[18px]">send</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Insights Widget */}
-            <div className="bg-surface border border-outline rounded-3xl p-6">
-              <h4 className="text-xs font-black text-primary uppercase tracking-widest mb-3 flex items-center gap-2">
-                <span className="material-symbols-outlined text-[18px]">speed</span>
-                Team Velocity
-              </h4>
-              <p className="text-sm font-bold text-on-surface mb-2">Workspace at 85% capacity</p>
-              <div className="w-full h-2 bg-surface-container rounded-full overflow-hidden">
-                <motion.div 
-                  initial={{ width: 0 }}
-                  animate={{ width: '85%' }}
-                  className="h-full bg-primary"
-                ></motion.div>
-              </div>
-            </div>
-          </div>
+          {/* Discussion Panel and Insights removed as per request */}
         </main>
       </div>
 
       <MobileNav />
 
       {/* Task Creation Modal */}
-      <AnimatePresence>
-        {isModalOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsModalOpen(false)}
-              className="absolute inset-0 bg-background/80 backdrop-blur-sm"
-            />
-            
-            <motion.div 
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-background border border-outline w-full max-w-md rounded-3xl p-8 shadow-2xl relative"
-            >
-              <button 
+      {hasMounted && createPortal(
+        <AnimatePresence>
+          {isModalOpen && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 onClick={() => setIsModalOpen(false)}
-                className="absolute top-6 right-6 text-on-surface-variant hover:text-on-surface"
+                className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+              />
+
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                className="relative z-[101] w-full max-w-md min-w-[320px] sm:min-w-[450px] flex-shrink-0 rounded-[32px] border border-outline bg-surface p-8 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] max-h-[90vh] overflow-y-auto"
               >
-                <span className="material-symbols-outlined">close</span>
-              </button>
-
-              <h3 className="text-2xl font-bold mb-2">Create New Task</h3>
-              <p className="text-sm text-on-surface-variant mb-8 uppercase font-black tracking-widest flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-primary" />
-                Adding to {modalStatus}
-              </p>
-
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest">Task Title</label>
-                  <input 
-                    autoFocus
-                    className="w-full bg-surface-container border border-outline rounded-xl p-4 text-on-surface focus:border-primary outline-none transition-colors"
-                    placeholder="What needs to be done?"
-                    value={newTaskTitle}
-                    onChange={(e) => setNewTaskTitle(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && confirmAddTask()}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest">Assign To</label>
-                  <input 
-                    className="w-full bg-surface-container border border-outline rounded-xl p-4 text-on-surface focus:border-primary outline-none transition-colors"
-                    placeholder="Employee Name"
-                    value={newTaskAssignee}
-                    onChange={(e) => setNewTaskAssignee(e.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest">Priority Level</label>
-                  <div className="grid grid-cols-4 gap-2">
-                    {['low', 'medium', 'high', 'urgent'].map((p) => (
-                      <button
-                        key={p}
-                        onClick={() => setNewTaskPriority(p)}
-                        className={`py-2 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-all
-                          ${newTaskPriority === p 
-                            ? 'bg-primary text-white border-primary' 
-                            : 'bg-surface-container border-outline text-on-surface-variant hover:border-on-surface/20'}`}
-                      >
-                        {p}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <button 
-                  onClick={confirmAddTask}
-                  className="w-full bg-primary text-white py-4 rounded-xl font-bold hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg"
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="absolute top-5 right-5 text-on-surface-variant hover:text-on-surface"
                 >
-                  Confirm Task
+                  <span className="material-symbols-outlined">close</span>
                 </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+
+                <h3 className="pr-10 text-2xl font-bold mb-2">Create New Task</h3>
+                <p className="text-sm text-on-surface-variant mb-8 uppercase font-black tracking-widest flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
+                  Adding to {modalStatus}
+                </p>
+
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest">Task Title</label>
+                    <input
+                      autoFocus
+                      className="w-full bg-surface-container border border-outline rounded-xl p-4 text-on-surface focus:border-primary outline-none transition-colors"
+                      placeholder="What needs to be done?"
+                      value={newTaskTitle}
+                      onChange={(e) => setNewTaskTitle(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && confirmAddTask()}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest">Assign To</label>
+                    <input
+                      className="w-full bg-surface-container border border-outline rounded-xl p-4 text-on-surface focus:border-primary outline-none transition-colors"
+                      placeholder="Employee Name"
+                      value={newTaskAssignee}
+                      onChange={(e) => setNewTaskAssignee(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest">Priority Level</label>
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                      {['low', 'medium', 'high', 'urgent'].map((p) => (
+                        <button
+                          key={p}
+                          onClick={() => setNewTaskPriority(p)}
+                          className={`py-3 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-all ${
+                            newTaskPriority === p
+                              ? 'bg-primary text-white border-primary'
+                              : 'bg-surface-container border-outline text-on-surface-variant hover:border-on-surface/20'
+                          }`}
+                        >
+                          {p}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={confirmAddTask}
+                    className="w-full bg-primary text-white py-4 rounded-xl font-bold hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg"
+                  >
+                    Confirm Task
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </div>
   );
 }

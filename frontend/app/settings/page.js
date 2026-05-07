@@ -3,14 +3,44 @@
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import MobileNav from "@/components/MobileNav";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { auth } from "@/lib/firebase";
+import { onAuthStateChanged } from "firebase/auth";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-hot-toast";
+import { getProfile, updateProfile } from "@/lib/profiles/profileService";
 
-export default function SettingsPage() {
+function SettingsContent() {
+  const [profile, setProfile] = useState({
+    full_name: "",
+    email: "",
+    bio: ""
+  });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [activeTab, setActiveTab] = useState("profile");
   const [themeMode, setThemeMode] = useState("dark");
   const [accentColor, setAccentColor] = useState("#1197e8");
+  const [integrations, setIntegrations] = useState({
+    "Google Calendar": true,
+    "Slack": true,
+    "Microsoft Outlook": false,
+    "Jitsi Meet": true
+  });
+
+  // Jitsi Meet is always available — no OAuth needed
+  useEffect(() => {
+    const status = searchParams.get('integration');
+    if (status === 'connected') {
+      setActiveTab("integrations");
+      toast.success("Integration connected!", { icon: '🔗' });
+      router.replace('/settings');
+    }
+  }, [searchParams]);
 
   // Apply theme class to document root
   useEffect(() => {
@@ -38,8 +68,104 @@ export default function SettingsPage() {
     { name: "Indigo", value: "#6366f1" },
   ];
 
-  const handleSave = () => {
-    toast.success("Settings updated successfully");
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        router.push("/login");
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const data = await getProfile(user.uid);
+        setProfile(data);
+      } catch (err) {
+        console.error("Fetch profile error:", err);
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [router]);
+
+  const handleSave = async (e) => {
+    if (e) e.preventDefault();
+    const user = auth.currentUser;
+    if (!user) return;
+
+    setSaving(true);
+    const id = toast.loading("Saving changes...");
+    try {
+      const result = await updateProfile(user.uid, profile);
+      if (result.success) {
+        toast.success("Profile updated!", { id });
+      }
+    } catch (err) {
+      console.error("Save profile error:", err);
+      toast.error("An error occurred", { id });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) return null; // or a spinner
+
+  const handleConnect = (name) => {
+    const isConnecting = !integrations[name];
+    
+    if (isConnecting) {
+      if (name === "Jitsi Meet") {
+        // Jitsi is free — instantly connect
+        setIntegrations(prev => ({ ...prev, [name]: true }));
+        toast.success("Jitsi Meet enabled! Free video meetings are ready.", {
+          icon: '🎥',
+          style: {
+            borderRadius: '12px',
+            background: 'var(--surface-container)',
+            color: 'var(--on-surface)',
+            border: '1px solid var(--outline)',
+            fontSize: '12px',
+            fontWeight: 'bold'
+          }
+        });
+        return;
+      }
+
+      toast.loading(`Syncing ${name} data...`, { duration: 1500 });
+      setTimeout(() => {
+        setIntegrations(prev => ({ ...prev, [name]: true }));
+        toast.success(`${name} connected successfully!`, {
+          icon: '🔗',
+          style: {
+            borderRadius: '12px',
+            background: 'var(--surface-container)',
+            color: 'var(--on-surface)',
+            border: '1px solid var(--outline)',
+            fontSize: '12px',
+            fontWeight: 'bold'
+          }
+        });
+      }, 1500);
+    } else {
+      if (name === "Jitsi Meet") {
+        setIntegrations(prev => ({ ...prev, [name]: false }));
+        toast.success("Jitsi Meet disabled.", { icon: '🔌' });
+        return;
+      }
+      setIntegrations(prev => ({ ...prev, [name]: false }));
+      toast.success(`${name} disconnected.`, {
+        icon: '🔌',
+        style: {
+          borderRadius: '12px',
+          background: 'var(--surface-container)',
+          color: 'var(--on-surface)',
+          border: '1px solid var(--outline)',
+          fontSize: '12px',
+          fontWeight: 'bold'
+        }
+      });
+    }
   };
 
   return (
@@ -47,7 +173,7 @@ export default function SettingsPage() {
       <Sidebar />
 
       <div className="flex-1 flex flex-col min-w-0 md:ml-64 relative h-screen">
-        <Header title="Settings" />
+        <Header title="Settings" userProfile={profile} />
 
         <main className="flex-1 overflow-y-auto custom-scrollbar p-6 pb-32">
           <motion.div 
@@ -109,8 +235,8 @@ export default function SettingsPage() {
                         </button>
                       </div>
                       <div className="flex-1 space-y-1">
-                        <h3 className="text-xl font-bold">Alex Carter</h3>
-                        <p className="text-sm text-on-surface-variant">Product Designer at Slotify Labs</p>
+                        <h3 className="text-xl font-bold">{profile?.full_name || "User"}</h3>
+                        <p className="text-sm text-on-surface-variant">{profile?.bio || "No bio set"}</p>
                         <div className="flex items-center gap-2 mt-4">
                           <span className="bg-primary/20 text-primary text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">Pro Account</span>
                           <span className="text-[10px] text-on-surface-variant">Member since Oct 2023</span>
@@ -121,15 +247,27 @@ export default function SettingsPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       <div className="space-y-2">
                         <label className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest">Full Name</label>
-                        <input className="w-full bg-surface-container border border-outline rounded-xl p-4 text-on-surface focus:border-primary outline-none transition-colors" defaultValue="Alex Carter" />
+                        <input 
+                          className="w-full bg-surface-container border border-outline rounded-xl p-4 text-on-surface focus:border-primary outline-none transition-colors" 
+                          value={profile?.full_name || ""} 
+                          onChange={(e) => setProfile({...profile, full_name: e.target.value})}
+                        />
                       </div>
                       <div className="space-y-2">
                         <label className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest">Email Address</label>
-                        <input className="w-full bg-surface-container border border-outline rounded-xl p-4 text-on-surface focus:border-primary outline-none transition-colors" defaultValue="alex@slotify.com" />
+                        <input 
+                          className="w-full bg-surface-container border border-outline rounded-xl p-4 text-on-surface focus:border-primary outline-none transition-colors" 
+                          value={profile?.email || ""} 
+                          onChange={(e) => setProfile({...profile, email: e.target.value})}
+                        />
                       </div>
                       <div className="md:col-span-2 space-y-2">
                         <label className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest">Bio</label>
-                        <textarea className="w-full bg-surface-container border border-outline rounded-xl p-4 text-on-surface focus:border-primary outline-none h-32 resize-none transition-colors" defaultValue="Building the future of team scheduling. Focused on deep work and minimalism." />
+                        <textarea 
+                          className="w-full bg-surface-container border border-outline rounded-xl p-4 text-on-surface focus:border-primary outline-none h-32 resize-none transition-colors" 
+                          value={profile?.bio || ""} 
+                          onChange={(e) => setProfile({...profile, bio: e.target.value})}
+                        />
                       </div>
                     </div>
                   </div>
@@ -260,33 +398,50 @@ export default function SettingsPage() {
                 {activeTab === "integrations" && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {[
-                      { name: "Google Calendar", status: "Connected", icon: "event", color: "text-blue-400" },
-                      { name: "Slack", status: "Connected", icon: "forum", color: "text-purple-400" },
-                      { name: "Microsoft Outlook", status: "Not Connected", icon: "mail", color: "text-blue-500" },
-                      { name: "Zoom", status: "Not Connected", icon: "videocam", color: "text-blue-300" }
-                    ].map((app, idx) => (
-                      <motion.div 
-                        whileHover={{ translateY: -5 }}
-                        key={idx} 
-                        className="p-6 bg-surface border border-outline rounded-3xl flex flex-col gap-6 hover:border-primary/40 transition-all"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className={`w-14 h-14 rounded-2xl bg-surface-container border border-outline flex items-center justify-center`}>
-                            <span className={`material-symbols-outlined text-3xl ${app.color}`}>{app.icon}</span>
+                      { name: "Google Calendar", icon: "event", color: "text-blue-400", desc: "Sync your calendar events with Slotify." },
+                      { name: "Slack", icon: "forum", color: "text-purple-400", desc: "Get meeting notifications in Slack." },
+                      { name: "Microsoft Outlook", icon: "mail", color: "text-blue-500", desc: "Sync Outlook calendar and contacts." },
+                      { name: "Jitsi Meet", icon: "videocam", color: "text-emerald-400", desc: "Free, open-source video meetings. No account needed." }
+                    ].map((app, idx) => {
+                      const isConnected = integrations[app.name];
+                      return (
+                        <motion.div 
+                          whileHover={{ translateY: -5 }}
+                          key={idx} 
+                          className={`p-6 bg-surface border rounded-3xl flex flex-col gap-6 transition-all ${isConnected ? 'border-primary/40 shadow-lg shadow-primary/5' : 'border-outline hover:border-on-surface/20'}`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className={`w-14 h-14 rounded-2xl bg-surface-container border border-outline flex items-center justify-center`}>
+                              <span className={`material-symbols-outlined text-3xl ${app.color}`}>{app.icon}</span>
+                            </div>
+                            <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${isConnected ? 'bg-success/10 text-success border border-success/20' : 'bg-surface-container text-on-surface-variant border border-outline'}`}>
+                              {isConnected ? 'Connected' : 'Not Connected'}
+                            </span>
                           </div>
-                          <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${app.status === 'Connected' ? 'bg-success/10 text-success border border-success/20' : 'bg-surface-container text-on-surface-variant border border-outline'}`}>
-                            {app.status}
-                          </span>
-                        </div>
-                        <div>
-                          <p className="font-bold text-lg mb-1 text-on-surface">{app.name}</p>
-                          <p className="text-xs text-on-surface-variant mb-4">Sync your {app.name.toLowerCase()} data with Slotify.</p>
-                          <button className="w-full py-3 rounded-xl border border-outline text-xs font-bold hover:bg-primary hover:border-primary hover:text-white transition-all text-on-surface">
-                            {app.status === 'Connected' ? 'Manage Settings' : 'Connect Now'}
-                          </button>
-                        </div>
-                      </motion.div>
-                    ))}
+                          <div>
+                            <p className="font-bold text-lg mb-1 text-on-surface">{app.name}</p>
+                            <p className="text-xs text-on-surface-variant mb-4">{app.desc}</p>
+                            
+                            {app.name === "Jitsi Meet" && isConnected && (
+                              <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl animate-fade-in">
+                                <p className="text-[10px] font-bold text-emerald-400 flex items-center gap-1">
+                                  <span className="material-symbols-outlined text-[14px]">check_circle</span>
+                                  Ready — Free meetings with no limits
+                                </p>
+                                <p className="text-[8px] text-on-surface-variant/50 font-bold mt-1">Links are auto-generated when you schedule meetings</p>
+                              </div>
+                            )}
+
+                            <button 
+                              onClick={() => handleConnect(app.name)}
+                              className={`w-full py-3 rounded-xl border text-xs font-bold transition-all ${isConnected ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' : 'border-outline hover:bg-surface-container text-on-surface'}`}
+                            >
+                              {isConnected ? 'Manage Settings' : 'Connect Now'}
+                            </button>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
                   </div>
                 )}
               </motion.div>
@@ -298,13 +453,14 @@ export default function SettingsPage() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleSave}
-                className="px-10 py-3 text-white font-bold rounded-xl shadow-lg transition-all"
+                disabled={saving}
+                className={`px-10 py-3 text-white font-bold rounded-xl shadow-lg transition-all ${saving ? 'opacity-50 cursor-not-allowed' : ''}`}
                 style={{ 
                   backgroundColor: accentColor,
                   shadowColor: `${accentColor}33`
                 }}
               >
-                Save Changes
+                {saving ? "Saving..." : "Save Changes"}
               </motion.button>
             </div>
 
@@ -342,5 +498,13 @@ export default function SettingsPage() {
 
       <MobileNav />
     </div>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense fallback={null}>
+      <SettingsContent />
+    </Suspense>
   );
 }

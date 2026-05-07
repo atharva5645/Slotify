@@ -354,7 +354,7 @@ export default function CalendarPage() {
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                className="bg-surface border border-outline w-full max-w-md rounded-3xl p-8 shadow-2xl relative overflow-hidden"
+                className="bg-surface border border-outline w-full max-w-md min-w-[320px] sm:min-w-[450px] flex-shrink-0 rounded-[32px] p-8 shadow-2xl relative overflow-hidden"
               >
                 <div className="absolute top-0 left-0 w-full h-1 bg-primary"></div>
                 <button 

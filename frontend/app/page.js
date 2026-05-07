@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 export const metadata = {
   title: "Slotify - Master Your Time",
@@ -14,8 +15,8 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link href="/" className="text-2xl font-black flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary icon-fill text-[28px]">all_inclusive</span>
-              <span className="tracking-tighter uppercase">Slotify</span>
+              <span className="material-symbols-outlined text-primary icon-fill text-[28px]">event_available</span>
+              <span className="tracking-tighter">Slotify</span>
             </Link>
             <nav className="hidden md:flex items-center gap-8">
               <Link href="#features" className="text-xs font-black uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors">Features</Link>
@@ -32,118 +33,119 @@ export default function LandingPage() {
         </div>
       </header>
 
-      <main className="pt-32">
+      <main className="pt-32 relative overflow-hidden">
+        {/* Decorative Background */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[600px] pointer-events-none -z-10">
+          <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] animate-pulse"></div>
+          <div className="absolute top-20 right-1/4 w-[400px] h-[400px] bg-blue-400/5 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
+        </div>
+
         {/* Hero Section */}
-        <section className="max-w-7xl mx-auto px-6 text-center flex flex-col items-center py-20">
-          <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full border border-outline bg-surface-container mb-10 animate-fade-in">
+        <section className="max-w-7xl mx-auto px-6 text-center py-20 relative z-10">
+          <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full border border-outline bg-surface-container mb-10 animate-fade-in mx-auto">
             <span className="w-2 h-2 rounded-full bg-[#a0d0c8] animate-pulse shadow-[0_0_8px_rgba(160,208,200,0.5)]"></span>
             <span className="text-[10px] font-black uppercase tracking-widest text-on-surface">Slotify 2.0 is now live</span>
           </div>
-          <h1 className="text-6xl md:text-8xl font-black tracking-tighter max-w-5xl mb-8 leading-[0.95]">
+          <h1 className="text-6xl md:text-8xl font-black tracking-tighter max-w-5xl mx-auto mb-8 leading-[0.95]">
             Master your time with <span className="text-primary">smart slots</span>
           </h1>
-          <p className="text-lg md:text-xl text-on-surface-variant max-w-2xl mb-12 leading-relaxed font-medium">
+          <p className="text-lg md:text-xl text-on-surface-variant max-w-[700px] mx-auto mb-12 leading-relaxed font-medium">
             The high-performance scheduling environment built for teams where clarity and speed are paramount. Reclaim your deep work hours.
           </p>
-          <div className="flex flex-col sm:flex-row items-center gap-6 mb-24 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-24 animate-fade-in" style={{ animationDelay: '0.2s' }}>
             <Link href="/login" className="bg-primary hover:opacity-90 text-white px-10 py-5 rounded-full text-sm font-black uppercase tracking-widest transition-all shadow-xl shadow-primary/30 active:scale-95">
               Start Scheduling Free
             </Link>
-            <button className="flex items-center gap-3 px-10 py-5 rounded-full border border-outline text-sm font-black uppercase tracking-widest hover:bg-surface-container transition-all active:scale-95">
-              <span className="material-symbols-outlined">play_circle</span>
-              Watch Demo
-            </button>
           </div>
 
-          {/* Dashboard Preview */}
-          <div className="w-full max-w-6xl aspect-video rounded-[40px] border-4 border-outline bg-surface-container overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.4)] relative group animate-fade-in" style={{ animationDelay: '0.4s' }}>
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10 pointer-events-none"></div>
-            <div className="flex h-full bg-background/50">
-              {/* Mock Sidebar */}
-              <div className="w-56 border-r border-outline p-6 flex flex-col gap-6">
-                <div className="h-6 w-32 bg-surface rounded-lg opacity-20"></div>
-                <div className="h-10 w-full bg-primary/20 rounded-xl flex items-center px-3 border border-primary/30">
-                  <div className="h-5 w-5 bg-primary rounded-md mr-3"></div>
-                  <div className="h-2 w-20 bg-primary rounded-full"></div>
+          {/* Product Showcase / Dashboard Preview */}
+          <div className="w-full max-w-6xl mx-auto rounded-[40px] border-4 border-outline bg-surface-container overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.4)] relative group animate-fade-in" style={{ animationDelay: '0.4s' }}>
+            <div className="bg-surface-container aspect-video relative overflow-hidden flex flex-col md:flex-row">
+              <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 via-transparent to-transparent pointer-events-none"></div>
+              
+              {/* Product Info Panel */}
+              <div className="w-full md:w-80 border-b md:border-b-0 md:border-r border-outline/50 p-8 flex flex-col justify-between bg-surface-container-low/50 backdrop-blur-xl text-left">
+                <div>
+                  <div className="flex items-center gap-2 mb-6">
+                    <span className="material-symbols-outlined text-primary font-bold">verified</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Core Experience</span>
+                  </div>
+                  <h3 className="text-2xl font-black mb-4 tracking-tight leading-tight">One platform for your entire workflow.</h3>
+                  <p className="text-xs text-on-surface-variant font-medium leading-relaxed mb-8">Slotify isn&apos;t just a calendar. It&apos;s a high-performance environment where tasks, meetings, and team velocity converge.</p>
+                  
+                  <ul className="space-y-4">
+                    <li className="flex items-start gap-3">
+                      <span className="material-symbols-outlined text-primary text-sm mt-0.5">check_circle</span>
+                      <span className="text-[11px] font-bold text-on-surface">AI-Powered Slot Optimization</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="material-symbols-outlined text-primary text-sm mt-0.5">check_circle</span>
+                      <span className="text-[11px] font-bold text-on-surface">Real-time Team Sync</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="material-symbols-outlined text-primary text-sm mt-0.5">check_circle</span>
+                      <span className="text-[11px] font-bold text-on-surface">Integrated Task Management</span>
+                    </li>
+                  </ul>
                 </div>
-                <div className="space-y-3">
-                  {[...Array(4)].map((_, i) => (
-                    <div key={i} className="h-10 w-full bg-surface rounded-xl border border-outline/30 opacity-40"></div>
-                  ))}
+
+                <div className="mt-8 pt-6 border-t border-outline/30">
+                  <div className="flex items-center gap-3">
+                    <div className="flex -space-x-2">
+                      {[1,2,3].map(i => (
+                        <div key={i} className="w-6 h-6 rounded-full border-2 border-surface bg-outline/20"></div>
+                      ))}
+                    </div>
+                    <span className="text-[9px] font-black text-on-surface-variant uppercase tracking-widest">Trusted by 2k+ Teams</span>
+                  </div>
                 </div>
               </div>
-              {/* Mock Content */}
-              <div className="flex-1 p-8 flex flex-col gap-8">
-                <div className="flex justify-between items-center">
-                  <div className="h-8 w-48 bg-surface rounded-xl opacity-30"></div>
-                  <div className="flex gap-2">
-                    <div className="h-10 w-10 bg-surface rounded-xl border border-outline/30"></div>
-                    <div className="h-10 w-10 bg-primary rounded-xl"></div>
-                  </div>
-                </div>
-                <div className="grid grid-cols-3 gap-8 h-full pb-10">
-                  <div className="space-y-4 col-span-2">
-                    <div className="h-40 w-full bg-surface-container/50 rounded-3xl border border-outline/50 p-6">
-                       <div className="h-4 w-1/3 bg-primary/20 rounded mb-4"></div>
-                       <div className="h-2 w-full bg-outline/20 rounded"></div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                       <div className="h-32 w-full bg-surface rounded-3xl border border-outline/30"></div>
-                       <div className="h-32 w-full bg-surface rounded-3xl border border-outline/30"></div>
-                    </div>
-                  </div>
-                  <div className="h-full w-full bg-surface-container rounded-[32px] border border-outline/50 relative overflow-hidden">
-                     <div className="absolute top-0 left-0 w-full h-1 bg-primary"></div>
-                  </div>
+
+              {/* Visual Preview */}
+              <div className="flex-1 p-8 bg-surface-container-lowest/30 relative overflow-hidden">
+                <div className="w-full h-full rounded-2xl border border-outline/50 bg-surface shadow-inner overflow-hidden relative">
+                   {/* Simplified Dashboard Mock */}
+                   <div className="absolute inset-0 flex flex-col">
+                      <div className="h-12 border-b border-outline/30 flex items-center px-4 gap-4 bg-surface-container/20">
+                         <div className="w-24 h-3 bg-outline/20 rounded-full"></div>
+                         <div className="w-16 h-3 bg-outline/10 rounded-full ml-auto"></div>
+                      </div>
+                      <div className="flex-1 flex">
+                         <div className="w-40 border-r border-outline/30 p-4 space-y-3 hidden sm:block">
+                            {[1,2,3,4].map(i => <div key={i} className="w-full h-2.5 bg-outline/10 rounded-full"></div>)}
+                         </div>
+                         <div className="flex-1 p-6 space-y-6">
+                            <div className="h-28 bg-primary/5 rounded-2xl border border-primary/10 flex items-center px-6 relative overflow-hidden">
+                               <div className="absolute left-0 top-0 w-1 h-full bg-primary"></div>
+                               <div className="w-full space-y-3">
+                                  <div className="w-1/3 h-4 bg-primary/20 rounded-md"></div>
+                                  <div className="w-2/3 h-2.5 bg-primary/10 rounded-full"></div>
+                               </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                               <div className="h-32 bg-outline/5 rounded-2xl border border-outline/20"></div>
+                               <div className="h-32 bg-outline/5 rounded-2xl border border-outline/20"></div>
+                            </div>
+                         </div>
+                      </div>
+                   </div>
+                   
+                   {/* Floating Feature Highlight */}
+                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-4 bg-primary rounded-2xl shadow-2xl shadow-primary/40 text-white flex items-center gap-4 border border-white/20 z-20">
+                      <span className="material-symbols-outlined text-3xl">auto_awesome</span>
+                      <div className="text-left">
+                        <p className="text-[9px] font-black uppercase tracking-widest opacity-80">AI Suggestion</p>
+                        <p className="text-sm font-bold">3 Optimized Slots Found</p>
+                      </div>
+                   </div>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Features Bento */}
-        <section id="features" className="max-w-7xl mx-auto px-6 py-40">
-          <div className="mb-20">
-            <h2 className="text-5xl font-black mb-6 tracking-tight">Engineered for <span className="text-primary">Efficiency</span></h2>
-            <p className="text-xl text-on-surface-variant max-w-xl font-medium">Powerful tools designed to minimize friction and maximize your team&apos;s output.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="md:col-span-2 p-10 rounded-[40px] border border-outline bg-surface-container/50 hover:border-primary/50 transition-all group relative overflow-hidden">
-              <div className="absolute -right-20 -top-20 w-64 h-64 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-all"></div>
-              <span className="material-symbols-outlined text-5xl text-primary mb-8">calendar_month</span>
-              <h3 className="text-3xl font-black mb-4">Intelligent Scheduling</h3>
-              <p className="text-on-surface-variant mb-10 max-w-md font-medium">Our algorithm automatically finds the perfect slots for deep work and meetings across time zones.</p>
-              <div className="h-48 w-full bg-background rounded-3xl border border-outline relative overflow-hidden">
-                <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-primary/10 to-transparent"></div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                   <div className="w-2/3 h-px bg-outline/30"></div>
-                   <div className="absolute w-4 h-4 rounded-full bg-primary shadow-[0_0_15px_var(--color-primary)]"></div>
-                </div>
-              </div>
-            </div>
-            <div className="p-10 rounded-[40px] border border-outline bg-surface-container/50 hover:border-[#a0d0c8]/50 transition-all">
-              <span className="material-symbols-outlined text-5xl text-[#a0d0c8] mb-8">group</span>
-              <h3 className="text-3xl font-black mb-4">Team Sync</h3>
-              <p className="text-on-surface-variant font-medium">See who&apos;s working on what in real-time. Resolve conflicts before they happen.</p>
-            </div>
-            <div className="p-10 rounded-[40px] border border-outline bg-surface-container/50 hover:border-[#ffb778]/50 transition-all">
-              <span className="material-symbols-outlined text-5xl text-[#ffb778] mb-8">bolt</span>
-              <h3 className="text-3xl font-black mb-4">Rapid Entry</h3>
-              <p className="text-on-surface-variant font-medium">Use natural language processing to add tasks in seconds.</p>
-            </div>
-            <div className="md:col-span-2 p-10 rounded-[40px] border border-outline bg-surface-container/50 hover:border-primary/50 transition-all flex flex-col md:flex-row gap-12 items-center">
-              <div className="flex-1">
-                <span className="material-symbols-outlined text-5xl text-primary mb-8">insights</span>
-                <h3 className="text-3xl font-black mb-4">Deep Analytics</h3>
-                <p className="text-on-surface-variant font-medium">Understand where your time goes. Generate reports to optimize your workflow and improve team velocity.</p>
-              </div>
-              <div className="w-40 h-40 rounded-full border-[12px] border-outline border-t-primary flex items-center justify-center relative">
-                <span className="text-3xl font-black">84%</span>
-                <div className="absolute -inset-2 rounded-full border border-primary/20 animate-ping opacity-20"></div>
-              </div>
-            </div>
-          </div>
-        </section>
+        {/* Features section removed as per request */}
 
         {/* Pricing Section */}
         <section id="pricing" className="max-w-7xl mx-auto px-6 py-40 border-t border-outline">
@@ -182,23 +184,15 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* CTA Section */}
-        <section className="bg-primary py-32 text-center px-6 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none"></div>
-          <h2 className="text-5xl md:text-7xl font-black mb-8 text-white tracking-tighter">Ready to reclaim your time?</h2>
-          <p className="text-xl text-white/80 max-w-2xl mx-auto mb-12 font-medium">Join 10,000+ high-performance teams already using Slotify to master their workflows.</p>
-          <Link href="/login" className="bg-white text-primary px-12 py-6 rounded-full text-sm font-black uppercase tracking-[0.2em] hover:shadow-[0_20px_50px_rgba(255,255,255,0.3)] transition-all inline-block active:scale-95">
-            Create Your Account
-          </Link>
-        </section>
+        {/* CTA section removed as per request */}
       </main>
 
       <footer className="border-t border-outline py-24 bg-surface-container/30">
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-16">
           <div className="md:col-span-1">
             <Link href="/" className="text-2xl font-black flex items-center gap-3 mb-8">
-              <span className="material-symbols-outlined text-primary icon-fill text-[32px]">all_inclusive</span>
-              <span className="tracking-tighter uppercase">Slotify</span>
+              <span className="material-symbols-outlined text-primary icon-fill text-[32px]">event_available</span>
+              <span className="tracking-tighter">Slotify</span>
             </Link>
             <p className="text-sm text-on-surface-variant leading-relaxed font-medium">The next generation scheduling environment for high-performance teams. Built for clarity and speed.</p>
           </div>

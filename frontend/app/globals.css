@@ -19,9 +19,11 @@
   --color-success: #10b981;
   --color-warning: #f59e0b;
   --color-error: #ef4444;
+
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.light-theme {
+html.light-theme {
   --bg-main: #f8fafc;
   --bg-surface: #ffffff;
   --bg-surface-soft: #f1f5f9;
@@ -30,13 +32,9 @@
   --border-main: #e2e8f0;
   --outline-main: #cbd5e1;
   
-  /* Brand Color */
-  --brand-primary: #1197e8;
-  
-  /* Status Colors (Light adjustment if needed, but defaults are usually fine) */
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
+  --color-surface-container-high: #f1f5f9;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-variant: #e2e8f0;
 }
 
 @theme {
@@ -48,12 +46,38 @@
   --color-on-surface: var(--text-main);
   --color-on-surface-variant: var(--text-soft);
   --color-primary: var(--brand-primary);
+  --color-primary-container: #1197e8;
   --color-outline: var(--border-main);
   --color-outline-variant: var(--outline-main);
+  --color-surface-container-high: #262a30;
+  --color-surface-container-lowest: #0a0f13;
+  --color-surface-variant: #31353b;
   
   --color-success: var(--color-success);
   --color-warning: var(--color-warning);
   --color-error: var(--color-error);
+
+  --spacing-2xl: 48px;
+  --spacing-xl: 32px;
+  --spacing-lg: 24px;
+  --spacing-md: 16px;
+  --spacing-sm: 8px;
+  --spacing-xs: 4px;
+
+  --font-size-h1: 32px;
+  --font-size-h2: 24px;
+  --font-size-h3: 20px;
+  --font-size-body-lg: 16px;
+  --font-size-body-md: 14px;
+  --font-size-label-md: 12px;
+  --font-size-caption: 12px;
+
+  --width-xs: 20rem;
+  --width-sm: 24rem;
+  --width-md: 28rem;
+  --width-lg: 32rem;
+  --width-xl: 36rem;
+  --width-2xl: 42rem;
 }
 
 @layer base {
