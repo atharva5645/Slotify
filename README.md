@@ -185,23 +185,7 @@ npm --prefix frontend install
 npm --prefix backend install
 ```
 
-### 4. Configure Environment Variables
-Create a `.env.local` file inside `frontend/` and `backend/`:
-
-```env
-# Firebase Configuration
-NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
-
-# AI Engine
-GEMINI_API_KEY=your_google_gemini_api_key
-```
-
-### 5. Launch Local Development
+### 4. Launch Local Development
 ```bash
 # Concurrently runs frontend (http://localhost:3000) & backend (http://localhost:3001)
 npm run dev
