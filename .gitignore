@@ -1,14 +1,46 @@
+# Dependencies & Build
 node_modules/
-.env*
 .next/
+out/
 build/
 dist/
 .firebase/
+
+# Environment variables & secrets (CRITICAL: Never commit)
+.env
+.env*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+*.env.*
+*.local
+!.env.example
+
+# Firebase & Cloud service account credentials / Private keys
+*firebase-adminsdk*.json
+*serviceAccount*.json
+*service-account*.json
+credentials.json
+client_secret*.json
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+
+# JSON configuration handling
 *.json
 !package.json
 !package-lock.json
 !firebase.json
 !.firebaserc
+!jsconfig.json
+!tsconfig.json
+
+# Whitelist code and docs
 !*.md
 !*.sql
 !*.js
