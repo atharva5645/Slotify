@@ -46,7 +46,6 @@
 | Environment | Direct URL | Status |
 | :--- | :--- | :--- |
 | **Production Web App** | [https://slotify-6c50f.web.app](https://slotify-6c50f.web.app) | ![Active](https://img.shields.io/badge/Status-Online-success?style=flat-square) |
-| **Firebase Alternative** | [https://slotify-6c50f.firebaseapp.com](https://slotify-6c50f.firebaseapp.com) | ![Active](https://img.shields.io/badge/Status-Online-success?style=flat-square) |
 
 > 💡 **Try it now**: Access the production build directly from your browser with Google Authentication or guest sign-in.
 
